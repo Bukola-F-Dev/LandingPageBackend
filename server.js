@@ -21,7 +21,7 @@ app.post("/contact", async (req, res) => {
       },
     });
 
-    // 1️⃣ Send message to Me
+    // Send message to Me
     await transporter.sendMail({
       from: email,
       to: process.env.GMAIL_USER,
@@ -29,7 +29,7 @@ app.post("/contact", async (req, res) => {
       text: message,
     });
 
-    // 2️⃣ Send Auto-Reply to the Sender
+    // Send Auto-Reply to the Sender
     await transporter.sendMail({
       from: process.env.GMAIL_USER,
       to: email,
