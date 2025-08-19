@@ -7,13 +7,15 @@
     "start": "node server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Terigbade Florence",
   "license": "ISC",
-  "description": "",
+  "description": "A phone Tech Company Landing Page",
   "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
     "nodemailer": "^7.0.5"
   },
   "devDependencies": {
