@@ -11,37 +11,34 @@ app.set("trust proxy", 1);
 app.use(cors());
 app.use(express.json());
 
-const limiter = rateLimit({
-  windowMs: 2 * 60 * 1000,
-  max: 5,
+// Rate limiter
+const contactLimiter = rateLimit({
+  windowMs: 2 * 60 * 1000, // 2 minutes
+  max: 5, // limit each IP to 5 requests per window
   message: { error: "Too many requests, please try again later." },
 });
-app.use("/contact", limiter);
 
-
- // Email sender
+// Nodemailer transporter
 const transporter = nodemailer.createTransport({
-  service: "gmail", 
+  service: "gmail",
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_APP_PASSWORD,
   },
-
-  pool: true, 
-  maxConnections: 5,  
-  rateLimit: 5, 
-
+  pool: true,
+  maxConnections: 5,
+  rateLimit: 5,
 });
 
+// Contact route
 app.post("/contact", contactLimiter, async (req, res) => {
   const { name, email, message } = req.body;
 
   if (!name || !email || !message) {
     return res.status(400).json({ error: "All fields are required" });
-  } 
- 
+  }
+
   try {
-    // Send message to Me
     await Promise.allSettled([
       transporter.sendMail({
         from: process.env.GMAIL_USER,
@@ -50,8 +47,6 @@ app.post("/contact", contactLimiter, async (req, res) => {
         subject: `Message from ${name}`,
         text: message,
       }),
-
-      //auto-reply to user
       transporter.sendMail({
         from: process.env.GMAIL_USER,
         to: email,
@@ -65,7 +60,7 @@ app.post("/contact", contactLimiter, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Failed to send message" });
-  } 
+  }
 });
 
 app.listen(5000, () => console.log("Server running on port 5000"));
