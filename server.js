@@ -13,12 +13,26 @@ app.use(express.json());
 
 // Rate limiter
 const contactLimiter = rateLimit({
-  windowMs: 2 * 60 * 1000, // 2 minutes
-  max: 5, // limit each IP to 5 requests per window
-  message: { error: "Too many requests, please try again later." },
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 3, // limit each IP to 3 requests per window
+  handler: (req, res) => {
+    return res.status(429).json({
+      success: false,
+      error: "Too many requests, please try again later.",
+    });
+  },
 });
 
-// Nodemailer transporter
+app.post("/contact", contactLimiter, async (req, res) => {
+  const { name, email, message } = req.body;
+
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+
+  try {
+    // Nodemailer transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -27,34 +41,25 @@ const transporter = nodemailer.createTransport({
   },
   pool: true,
   maxConnections: 5,
-  rateLimit: 5,
 });
 
-// Contact route
-app.post("/contact", contactLimiter, async (req, res) => {
-  const { name, email, message } = req.body;
 
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
+// message to me
+await transporter.sendMail({
+  from: email,
+  to: process.env.GMAIL_USER,
+  subject: `Message from ${name}`,
+  text: message,
+});
 
-  try {
-    await Promise.allSettled([
-      transporter.sendMail({
-        from: process.env.GMAIL_USER,
-        replyTo: email,
-        to: process.env.GMAIL_USER,
-        subject: `Message from ${name}`,
-        text: message,
-      }),
-      transporter.sendMail({
-        from: process.env.GMAIL_USER,
-        to: email,
-        subject: "Thank you for contacting us",
-        text: `Hi ${name},\n\nThanks for reaching out! 
-        We'll respond shortly.\n\nBest regards,\nPhone Tech Team`,
-      }),
-    ]);
+// Auto reply to the sender
+await transporter.sendMail({
+  from: process.env.GMAIL_USER,
+  to: email,
+  subject: "Thank you for contacting us",
+  text: `Hi ${name},\n\nThanks for reaching out! 
+  We'll respond shortly.\n\nBest regards,\nPhone Tech Team`,
+});
 
     res.json({ success: true, message: "Message sent!" });
   } catch (error) {
