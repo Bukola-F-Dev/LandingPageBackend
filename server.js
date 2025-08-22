@@ -12,7 +12,7 @@ app.set("trust proxy", 1);
 app.use(cors());
 app.use(express.json());
 
-// --- ZeroBounce validation ---
+// ZeroBounce validation
 async function validateEmailWithZeroBounce(email) {
   try {
     const apiKey = process.env.ZEROBOUNCE_API_KEY;
@@ -25,7 +25,7 @@ async function validateEmailWithZeroBounce(email) {
   }
 }
 
-// --- reCAPTCHA validation ---
+// recaptcha validation
 async function validateCaptcha(token) {
   try {
     const secretKey = process.env.RECAPTCHA_SECRET_KEY;
@@ -38,7 +38,7 @@ async function validateCaptcha(token) {
   }
 }
 
-// --- Rate limiter ---
+// Rate limiter
 const contactLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
   max: 3,
@@ -50,7 +50,7 @@ const contactLimiter = rateLimit({
   },
 });
 
-// --- Contact route ---
+
 app.post("/contact", contactLimiter, async (req, res) => {
   const { name, email, message, captcha } = req.body;
 
