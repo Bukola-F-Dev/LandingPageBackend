@@ -12,6 +12,8 @@ app.set("trust proxy", 1);
 app.use(cors());
 app.use(express.json());
 
+console.log("GMAIL_USER:", process.env.GMAIL_USER);
+
 // ZeroBounce validation
 async function validateEmailWithZeroBounce(email) {
   try {
