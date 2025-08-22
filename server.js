@@ -21,7 +21,6 @@ async function validateEmailWithZeroBounce(email) {
     );
     return response.data;
   } catch (err) {
-    console.error("ZeroBounce validation error:", err.message);
     return { status: "error" };
   }
 }
@@ -35,8 +34,7 @@ async function validateCaptcha(token) {
     );
     return response.data.success;
   } catch (err) {
-    console.error("Captcha verification error:", err.message);
-    return false;
+    return { status: "error" };
   }
 }
 
