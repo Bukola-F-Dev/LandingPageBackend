@@ -14,7 +14,7 @@ app.use(express.json());
 
 console.log("GMAIL_USER:", process.env.GMAIL_USER);
 
-// ZeroBounce validation
+{/* // ZeroBounce validation
 async function validateEmailWithZeroBounce(email) {
   try {
     const apiKey = process.env.ZEROBOUNCE_API_KEY;
@@ -25,7 +25,7 @@ async function validateEmailWithZeroBounce(email) {
   } catch (err) {
     return { status: "error" };
   }
-}
+}  */}
 
 // recaptcha validation
 async function validateCaptcha(token) {
