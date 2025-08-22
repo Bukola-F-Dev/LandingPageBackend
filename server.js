@@ -66,19 +66,6 @@ app.post("/contact", contactLimiter, async (req, res) => {
     return res.status(400).json({ success: false, message: "Captcha failed" });
   }
 
-  //Validate email with ZeroBounce
-  const validation = await validateEmailWithZeroBounce(email);
-  if (
-    validation.status !== "valid" ||
-    validation.sub_status === "mailbox_not_found" ||
-    validation.sub_status === "disposable" ||
-    validation.sub_status === "toxic"
-  ) {
-    return res.status(400).json({
-      success: false,
-      error: "Invalid or non-existent email address",
-    });
-  }
 
   try {
     // Nodemailer transporter
